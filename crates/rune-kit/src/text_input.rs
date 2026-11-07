@@ -96,6 +96,13 @@ impl EditActs {
     fn change<S: 'static>(&mut self, f: impl Fn(&mut S, &mut Tx) + 'static) {
         self.handlers.push(Box::new(move |e: El| e.on_input_change(f)));
     }
+    fn paste<S: 'static>(
+        &mut self,
+        f: impl Fn(&mut S, &rune::ClipboardContent, &mut Tx) -> bool + 'static,
+    ) {
+        self.handlers
+            .push(Box::new(move |e: El| e.on_input_paste(f)));
+    }
     fn visual(&mut self, f: impl FnOnce(El) -> El + 'static) {
         self.visual.push(Box::new(f));
     }
@@ -302,6 +309,14 @@ impl TextInput {
         self.copy_acts.press_tx(f);
         self
     }
+    /// See [`El::on_input_paste`](rune::El::on_input_paste).
+    pub fn on_input_paste<S: 'static>(
+        mut self,
+        f: impl Fn(&mut S, &rune::ClipboardContent, &mut Tx) -> bool + 'static,
+    ) -> Self {
+        self.edits.paste(f);
+        self
+    }
     rich_forwarders!();
 
     pub fn build(self, k: &Kit) -> El {
@@ -496,6 +511,15 @@ impl TextArea {
     }
     pub fn on_change<S: 'static>(mut self, f: impl Fn(&mut S, &mut Tx) + 'static) -> Self {
         self.edits.change(f);
+        self
+    }
+    /// See [`El::on_input_paste`](rune::El::on_input_paste). Requests every clipboard form
+    /// (files and images too) so the field can stage attachments on paste.
+    pub fn on_input_paste<S: 'static>(
+        mut self,
+        f: impl Fn(&mut S, &rune::ClipboardContent, &mut Tx) -> bool + 'static,
+    ) -> Self {
+        self.edits.paste(f);
         self
     }
     rich_forwarders!();
