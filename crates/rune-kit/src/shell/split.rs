@@ -136,6 +136,8 @@ pub struct SplitView {
     sidebar: Option<Pane>,
     inspector: Option<Pane>,
     toolbar: Option<Toolbar>,
+    /// Brand / home control in the sidebar's title-bar band, past the traffic-light clearance.
+    sidebar_leading: Option<El>,
     inset: f32,
     show_toggle: bool,
     toggle: SidebarToggle,
@@ -154,6 +156,7 @@ impl SplitView {
             sidebar: None,
             inspector: None,
             toolbar: None,
+            sidebar_leading: None,
             inset: 0.0,
             show_toggle: true,
             toggle: SidebarToggle::new(),
@@ -164,6 +167,12 @@ impl SplitView {
             peek: None,
             reduced: false,
         }
+    }
+    /// Content in the sidebar's title-bar band (a brand mark that goes Home), past the
+    /// traffic lights and before the toggle's spacer.
+    pub fn sidebar_leading(mut self, e: El) -> Self {
+        self.sidebar_leading = Some(e);
+        self
     }
     /// The leading pane. `access` finds its state in the app's; the grip and the toggle button
     /// write to it. `content` is usually a built `Sidebar`.
@@ -322,6 +331,9 @@ impl SplitView {
                 .center_y()
                 .window_drag()
                 .child(el().key("sidebar-titlebar-clear").w((clear - self.padding[0]).max(0.0)).motion(spring).a11y_hidden());
+            if let Some(leading) = self.sidebar_leading {
+                band = band.child(leading);
+            }
             if toggle && t.in_header {
                 band = band.child(el().key("sidebar-spacer").grow(1.0).a11y_hidden()).child(el().key("sidebar-toggle-slot").w(side).ml(8.0).a11y_hidden());
             }
