@@ -163,9 +163,10 @@ pub(super) fn register_cjk_fallbacks(collection: &mut Collection, registered: &[
 fn register_system_cjk(collection: &mut Collection, loaded: &mut LoadedFiles, files: Vec<std::path::PathBuf>, families: (&str, &str), all: &mut Vec<FamilyId>) {
     let primary = [collection.family_id(families.0), collection.family_id(families.1)];
     let before = all.len();
-    // Only files new to the collection: one already loaded is a fallback already.
-    let new: Vec<std::path::PathBuf> = files.into_iter().filter(|f| !loaded.contains_key(f)).take(16).collect();
-    for id in load_files(collection, loaded, new) {
+    // `load_files` caches by path in `loaded`, so a `.ttc` already loaded by `load_installed`
+    // (e.g. `NotoSansCJK-Regular.ttc` for `Noto Sans Mono CJK SC`) still yields its CJK sans
+    // families here without loading the file twice.
+    for id in load_files(collection, loaded, files.into_iter().take(16)) {
         if !primary.contains(&Some(id)) && !all.contains(&id) {
             all.push(id);
         }
