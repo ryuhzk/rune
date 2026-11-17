@@ -1,0 +1,1 @@
+- SplitView accepts sidebar_leading content in its title-bar band, after the native window-control clearance.
