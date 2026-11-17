@@ -1,0 +1,1 @@
+- TextInput and TextArea expose on_input_paste so applications can handle image and file attachments while preserving normal text paste.
