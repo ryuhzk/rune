@@ -179,6 +179,9 @@ pub enum WindowEvent {
     /// separately.
     DroppedFile(PathBuf),
 
+    /// Position of an external file drag, in physical surface coordinates.
+    FileDragMoved { position: PhysicalPosition<f64> },
+
     /// A file is being hovered over the window.
     ///
     /// When the user hovers multiple files at once, this event will be emitted for each file

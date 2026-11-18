@@ -54,6 +54,8 @@ pub struct WinitState {
     /// The seat state responsible for all sorts of input.
     pub seat_state: SeatState,
 
+    pub file_drop: super::file_drop::FileDropState,
+
     /// The shm for software buffers, such as cursors.
     pub shm: Shm,
 
@@ -143,8 +145,10 @@ impl WinitState {
 
         let seat_state = SeatState::new(globals, queue_handle);
 
+        let mut file_drop = super::file_drop::FileDropState::new(globals, queue_handle);
         let mut seats = AHashMap::default();
         for seat in seat_state.seats() {
+            file_drop.add_seat(queue_handle, &seat);
             seats.insert(seat.id(), WinitSeatState::new());
         }
 
@@ -164,6 +168,7 @@ impl WinitState {
             subcompositor_state: subcompositor_state.map(Arc::new),
             output_state,
             seat_state,
+            file_drop,
             shm,
             custom_cursor_pool,
 

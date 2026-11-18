@@ -1,0 +1,1 @@
+- Accept native Wayland file drags, preserve surface coordinates for drop targets, and clean up cancelled transfers without changing clipboard selection.

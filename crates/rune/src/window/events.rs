@@ -89,7 +89,7 @@ impl<S: 'static> Host<S> {
             match step {
                 FileStep::Enter(paths) => {
                     let pointer = crate::input::drop_pointer::DropPointer::new();
-                    f.at = pointer.sample(&l.window, self.rt.zoom()).or_else(|| self.rt.pointer());
+                    f.at = pointer.sample(&l.window, self.rt.zoom()).or(f.at).or_else(|| self.rt.pointer());
                     f.pointer = Some(pointer);
                     self.rt.drag_files(paths, f.at);
                 }
@@ -243,6 +243,13 @@ impl<S: 'static> Host<S> {
             }
             WindowEvent::CloseRequested => {
                 self.close(event_loop);
+                return;
+            }
+            WindowEvent::FileDragMoved { position } => {
+                let at = (position.x as f32 / self.rt.input_scale(), position.y as f32 / self.rt.input_scale());
+                self.files.at = Some(at);
+                self.rt.drag_files_to(Some(at));
+                if let Some(l) = &self.win { l.request_redraw(); }
                 return;
             }
             WindowEvent::HoveredFile(path) => { self.files.file(path, false); return; }
