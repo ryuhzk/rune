@@ -389,11 +389,11 @@ index fef13f4..5150002 100644
                      mem::drop(state.windows.get_mut().remove(window_id));
                      return Some(WindowEvent::Destroyed);
                  }
-diff --git 1/vendor/winit/src/platform_impl/linux/wayland/file_drop.rs 2/vendor/winit/src/platform_impl/linux/wayland/file_drop.rs
+diff --git a/src/platform_impl/linux/wayland/file_drop.rs b/src/platform_impl/linux/wayland/file_drop.rs
 new file mode 100644
 index 0000000..f6e1adb
 --- /dev/null
-+++ 2/vendor/winit/src/platform_impl/linux/wayland/file_drop.rs
++++ b/src/platform_impl/linux/wayland/file_drop.rs
 @@ -0,0 +1,421 @@
 +//! Native wl_data_device file drops. Clipboard selection remains owned by the application.
 +use super::{state::WinitState, WindowId};
@@ -816,11 +816,11 @@ index 0000000..f6e1adb
 +#[cfg(test)]
 +#[path = "file_drop_tests.rs"]
 +mod tests;
-diff --git 1/vendor/winit/src/platform_impl/linux/wayland/file_drop_tests.rs 2/vendor/winit/src/platform_impl/linux/wayland/file_drop_tests.rs
+diff --git a/src/platform_impl/linux/wayland/file_drop_tests.rs b/src/platform_impl/linux/wayland/file_drop_tests.rs
 new file mode 100644
 index 0000000..c5e17b5
 --- /dev/null
-+++ 2/vendor/winit/src/platform_impl/linux/wayland/file_drop_tests.rs
++++ b/src/platform_impl/linux/wayland/file_drop_tests.rs
 @@ -0,0 +1,13 @@
 +use super::*;
 +#[test]
