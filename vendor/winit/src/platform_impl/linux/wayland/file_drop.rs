@@ -31,6 +31,15 @@ use std::{
 
 const MIME: &str = "text/uri-list";
 const MAX_BYTES: usize = 1024 * 1024;
+// SCTK 0.19 retains source_actions but drops an action received before enter.
+// Some compositors (including Hyprland) send it only in that order. We
+// request only Copy and never acknowledge completion for an unknown action.
+fn copy_drop(version: u32, selected: DndAction, offered: DndAction) -> bool {
+    version < 3
+        || selected == DndAction::Copy
+        || (selected.is_empty() && offered.contains(DndAction::Copy))
+}
+
 struct Drag {
     offer: DragOffer,
     window: WindowId,
@@ -293,7 +302,11 @@ impl DataDeviceHandler for WinitState {
                 return;
             }
             drag.dropped = true;
-            if drag.offer.inner().version() >= 3 && drag.offer.selected_action != DndAction::Copy {
+            if !copy_drop(
+                drag.offer.inner().version(),
+                drag.offer.selected_action,
+                drag.offer.source_actions,
+            ) {
                 self.cancel_file_drag(&device.id());
             } else {
                 self.publish_file_drag(&device.id());
@@ -307,8 +320,13 @@ impl DataOfferHandler for WinitState {
         _: &Connection,
         _: &QueueHandle<Self>,
         offer: &mut DragOffer,
-        _: DndAction,
+        actions: DndAction,
     ) {
+        for drag in self.file_drop.drags.values_mut() {
+            if drag.offer.inner() == offer.inner() {
+                drag.offer.source_actions = actions;
+            }
+        }
         offer.set_actions(DndAction::Copy, DndAction::Copy);
     }
     fn selected_action(
